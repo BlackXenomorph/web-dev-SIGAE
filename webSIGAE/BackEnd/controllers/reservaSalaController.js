@@ -4,6 +4,11 @@ const pool = require('../config/db');
 
 const ROLES_AUTORIZADOS = ['Super Administrador', 'Super Admin', 'Administrador', 'Docente'];
 
+const ROLES_ADMIN = ['Super Administrador', 'Super Admin', 'Administrador'];
+
+const esAdmin = (user) =>
+  (user?.roles || []).some((rol) => ROLES_ADMIN.includes(rol));
+
 const puedeReservar = (user) =>
   (user?.roles || []).some((rol) => ROLES_AUTORIZADOS.includes(rol));
 
@@ -152,7 +157,47 @@ const crearReservaSala = async (req, res) => {
   }
 };
 
+// DELETE /api/reservas-sala/:id
+const cancelarReservaSala = async (req, res) => {
+  if (!puedeReservar(req.user)) {
+    return res.status(403).json({ mensaje: 'No tienes permisos para cancelar reservas.' });
+  }
+
+  const reservaId = Number(req.params.id);
+  if (!Number.isInteger(reservaId) || reservaId <= 0) {
+    return res.status(400).json({ mensaje: 'Identificador de reserva inválido.' });
+  }
+
+  try {
+    const [reservas] = await pool.query(
+      'SELECT Reserva_Sala_Id, Usuario_Id FROM reserva_sala WHERE Reserva_Sala_Id = ?',
+      [reservaId]
+    );
+
+    if (reservas.length === 0) {
+      return res.status(404).json({ mensaje: 'La reserva no existe o ya fue cancelada.' });
+    }
+
+    const reserva = reservas[0];
+
+    // Excepción 1 (CU110): solo el responsable o un administrador puede cancelar
+    if (reserva.Usuario_Id !== req.user.id && !esAdmin(req.user)) {
+      return res.status(403).json({
+        mensaje: 'Solo el responsable de la reserva o un administrador puede cancelarla.',
+      });
+    }
+
+    await pool.query('DELETE FROM reserva_sala WHERE Reserva_Sala_Id = ?', [reservaId]);
+
+    return res.json({ mensaje: 'Reserva de sala cancelada correctamente.' });
+  } catch (error) {
+    console.error('cancelarReservaSala:', error);
+    return res.status(500).json({ mensaje: 'No fue posible cancelar la reserva de la sala.' });
+  }
+};
+
 module.exports = {
   getReservasPorFecha,
   crearReservaSala,
+  cancelarReservaSala,
 };

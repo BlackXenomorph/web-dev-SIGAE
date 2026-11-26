@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getReservasSala, crearReservaSala } from "../../services/api";
+import { getReservasSala, crearReservaSala, cancelarReservaSala } from "../../services/api";
 
 function fechaHoy() {
   const hoy = new Date();
@@ -80,6 +80,29 @@ function ReservaSala() {
       setMensajeError(err.message || "No fue posible registrar la reserva.");
     } finally {
       setEnviando(false);
+    }
+  };
+
+  const handleCancelarReserva = async (reservaId) => {
+    // Excepción 2 (CU110): solicitud de confirmación
+    const confirmado = window.confirm("¿Estás seguro de que deseas cancelar esta reserva?");
+    if (!confirmado) return;
+
+    setMensajeExito("");
+    setMensajeError("");
+
+    try {
+      const resp = await cancelarReservaSala(reservaId);
+      setMensajeExito(resp?.mensaje || "Reserva de sala cancelada correctamente.");
+
+      // Recargar tabla para reflejar el bloque liberado
+      const data = await getReservasSala(fecha);
+      if (data?.bloques) {
+        setBloques(data.bloques);
+      }
+    } catch (err) {
+      // Excepción 1 (CU110): sin permisos u otro error controlado
+      setMensajeError(err.message || "No fue posible cancelar la reserva.");
     }
   };
 
@@ -200,6 +223,7 @@ function ReservaSala() {
               <th style={{ padding: "10px", border: "1px solid #ddd" }}>Jornada</th>
               <th style={{ padding: "10px", border: "1px solid #ddd" }}>Estado</th>
               <th style={{ padding: "10px", border: "1px solid #ddd" }}>Reservado por</th>
+              <th style={{ padding: "10px", border: "1px solid #ddd" }}>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -221,6 +245,27 @@ function ReservaSala() {
                 </td>
                 <td style={{ padding: "10px", border: "1px solid #ddd" }}>
                   {b.reserva ? b.reserva.reservado_por : "—"}
+                </td>
+                <td style={{ padding: "10px", border: "1px solid #ddd" }}>
+                  {b.ocupado && b.reserva ? (
+                    <button
+                      type="button"
+                      onClick={() => handleCancelarReserva(b.reserva.Reserva_Sala_Id)}
+                      style={{
+                        backgroundColor: "#dc2626",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "6px 12px",
+                        fontWeight: "600",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Cancelar
+                    </button>
+                  ) : (
+                    "—"
+                  )}
                 </td>
               </tr>
             ))}

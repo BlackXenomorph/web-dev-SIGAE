@@ -1011,4 +1011,13 @@ export async function crearReservaSala({ fecha, bloqueHorarioId }) {
   });
   if (!res) return null;
   return handleResponse(res);
+  
+}
+
+export async function cancelarReservaSala(reservaId) {
+  const res = await apiFetch(`${BASE_URL}/reservas-sala/${reservaId}`, {
+    method: 'DELETE',
+  });
+  if (!res) return null;
+  return handleResponse(res);
 }
