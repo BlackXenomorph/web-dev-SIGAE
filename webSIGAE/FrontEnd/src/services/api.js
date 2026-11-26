@@ -993,3 +993,22 @@ export async function marcarNotificacionesLeidas() {
   if (!res) return;
   return res.json().catch(() => ({}));
 }
+
+// ── CU109 / RF63: Reserva de sala multiuso ──
+
+export async function getReservasSala(fecha) {
+  const params = new URLSearchParams({ fecha });
+  const res = await apiFetch(`${BASE_URL}/reservas-sala?${params.toString()}`);
+  if (!res) return null;
+  return handleResponse(res);
+}
+
+export async function crearReservaSala({ fecha, bloqueHorarioId }) {
+  const res = await apiFetch(`${BASE_URL}/reservas-sala`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fecha, bloqueHorarioId: Number(bloqueHorarioId) }),
+  });
+  if (!res) return null;
+  return handleResponse(res);
+}

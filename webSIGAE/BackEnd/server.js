@@ -67,6 +67,7 @@ const evaluacionRoutes = require('./routes/evaluacionRoutes');
 const electivoRoutes = require('./routes/electivoRoutes');
 const colorRoutes = require('./routes/colorRoutes');
 const notificacionRoutes = require('./routes/notificacionRoutes');
+const reservaSalaRoutes = require('./routes/reservaSalaRoutes');
 
 app.use('/api/auth',        authRoutes);
 app.use('/api/usuarios',    usuarioRoutes);
@@ -85,6 +86,7 @@ app.use('/api/evaluaciones', evaluacionRoutes);
 app.use('/api/electivos', electivoRoutes);
 app.use('/api/colores', colorRoutes);
 app.use('/api/notificaciones', notificacionRoutes);
+app.use('/api/reservas-sala', reservaSalaRoutes);
 
 // 404
 app.use((req, res) => {

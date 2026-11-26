@@ -281,6 +281,8 @@ function MainLayout() {
 
                 <Link to="/citaciones">Citaciones</Link>
 
+                <Link to="/reserva-sala">Reserva de Sala</Link>
+
                 <Link to="/calendario-evaluaciones">Calendario de Evaluaciones</Link>
 
                 <Link to="/citaciones/historial">
@@ -329,6 +331,11 @@ function MainLayout() {
                 <Link to="/mensajes">
                   Mensajes
                 </Link>
+
+                <Link to="/reserva-sala">
+                  Reserva de Sala
+                </Link>
+
               </>
             )}
 

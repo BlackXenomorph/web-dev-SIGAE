@@ -52,6 +52,7 @@ import Electivos from "../pages/academic/Electivos";
 import Asignaturas from "../pages/academic/Asignaturas";
 import SituacionFinal from "../pages/academic/SituacionFinal";
 import CierrePeriodo from "../pages/academic/CierrePeriodo";
+import ReservaSala from "../pages/academic/ReservaSala";
 
 /* COMMUNICATION */
 
@@ -392,6 +393,17 @@ function AppRouter() {
               </RoleRoute>
             }
           />
+          
+          {/* CU109 / RF63: Reserva de sala multiuso — Super Admin, Admin y Docente */}
+          <Route
+            path="/reserva-sala"
+            element={
+              <RoleRoute roles={["Docente", "Administrador"]}>
+                <ReservaSala />
+              </RoleRoute>
+            }
+          />
+
 
         </Route>
 
