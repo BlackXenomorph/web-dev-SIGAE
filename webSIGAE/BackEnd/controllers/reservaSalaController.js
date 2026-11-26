@@ -87,18 +87,19 @@ const crearReservaSala = async (req, res) => {
     return res.status(403).json({ mensaje: 'No tienes permisos para reservar la sala multiuso.' });
   }
 
+  const { fecha, bloqueHorarioId } = req.body || {};
+  const bloqueId = Number(bloqueHorarioId);
+
+  // Excepción 3 (CU109): validar campos obligatorios y formato
+  if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha) || !Number.isInteger(bloqueId) || bloqueId <= 0) {
+    return res.status(400).json({ mensaje: 'Debes seleccionar una fecha y un horario válidos.' });
+  }
+
   // Excepción 2 (CU109): no permitir reservas en fechas pasadas
   if (fecha < hoyLocal()) {
     return res.status(400).json({
       mensaje: 'No es posible reservar la sala en una fecha pasada.',
     });
-  }
-
-  const { fecha, bloqueHorarioId } = req.body || {};
-  const bloqueId = Number(bloqueHorarioId);
-
-  if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha) || !Number.isInteger(bloqueId) || bloqueId <= 0) {
-    return res.status(400).json({ mensaje: 'Debes seleccionar una fecha y un horario válidos.' });
   }
 
   try {
